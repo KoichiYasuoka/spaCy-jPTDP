@@ -6,7 +6,7 @@ URL="https://github.com/KoichiYasuoka/spaCy-jPTDP"
 
 setuptools.setup(
   name="spacy_jptdp",
-  version="0.1.0",
+  version="0.2.0",
   description="jPTDP wrapper for spaCy",
   long_description=long_description,
   long_description_content_type="text/markdown",
