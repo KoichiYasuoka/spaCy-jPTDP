@@ -38,12 +38,12 @@ def vocab(conll_path):
 
     # Character vocabulary
     c2i = {}
-    c2i["_UNK"] = 0  # unk char
-    c2i["<w>"] = 1  # word start
-    c2i["</w>"] = 2  # word end index
-    c2i["NUM"] = 3
-    c2i["EMAIL"] = 4
-    c2i["URL"] = 5
+    c2i[b"_UNK"] = 0  # unk char
+    c2i[b"<w>"] = 1  # word start
+    c2i[b"</w>"] = 2  # word end index
+    c2i[b"NUM"] = 3
+    c2i[b"EMAIL"] = 4
+    c2i[b"URL"] = 5
 
     root = ConllEntry(0, '*root*', '*root*', 'ROOT-POS', 'ROOT-CPOS', '_', -1, 'rroot', '_', '_')
     root.idChars = [1, 2]
@@ -72,10 +72,11 @@ def vocab(conll_path):
                     entry.idChars = [1, 5, 2]
                 else:
                     chars_of_word = [1]
-                    for char in tok[1]:
-                        if char not in c2i:
-                            c2i[char] = len(c2i)
-                        chars_of_word.append(c2i[char])
+                    for char in tok[1].encode("utf-8"):
+                        b = bytes([char])
+                        if b not in c2i:
+                            c2i[b] = len(c2i)
+                        chars_of_word.append(c2i[b])
                     chars_of_word.append(2)
                     entry.idChars = chars_of_word
 
@@ -115,9 +116,10 @@ def read_conll(fh, c2i):
                     entry.idChars = [1, 5, 2]
                 else:
                     chars_of_word = [1]
-                    for char in tok[1]:
-                        if char in c2i:
-                            chars_of_word.append(c2i[char])
+                    for char in tok[1].encode("utf-8"):
+                        b = bytes([char])
+                        if b in c2i:
+                            chars_of_word.append(c2i[b])
                         else:
                             chars_of_word.append(0)
                     chars_of_word.append(2)
@@ -138,8 +140,8 @@ def read_conll_predict(fh, c2i, wordsCount):
 
     brackets_train = {} 
     for word in wordsCount:
-    	if word in brackets:
-    		brackets_train[brackets[word]] = word
+        if word in brackets:
+            brackets_train[brackets[word]] = word
 
     for line in fh:
         tok = line.strip().split('\t')
@@ -174,18 +176,19 @@ def read_conll_predict(fh, c2i, wordsCount):
                         tok[1] = "-"
 
                     if entry.norm in brackets:
-                    	entry.norm = brackets[entry.norm]
-                    	tok[1] = entry.norm
+                        entry.norm = brackets[entry.norm]
+                        tok[1] = entry.norm
                     if entry.norm in brackets_train:
-                    	entry.norm = brackets_train[entry.norm]
-                    	tok[1] = str(entry.norm).upper()
+                        entry.norm = brackets_train[entry.norm]
+                        tok[1] = str(entry.norm).upper()
                         if tok[1].lower() in ["&lt;", "&gt;", "&amp;"]:
                             tok[1] = tok[1].lower()
 
                     chars_of_word = [1]
-                    for char in tok[1]:
-                        if char in c2i:
-                            chars_of_word.append(c2i[char])
+                    for char in tok[1].encode("utf-8"):
+                        b = bytes([char])
+                        if b in c2i:
+                            chars_of_word.append(c2i[b])
                         else:
                             chars_of_word.append(0)
                     chars_of_word.append(2)

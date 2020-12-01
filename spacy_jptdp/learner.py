@@ -1,11 +1,12 @@
 # coding=utf-8
 from dynet import *
 import dynet
-from utils import read_conll, read_conll_predict, write_conll, load_embeddings_file
 from operator import itemgetter
-import utils, time, random, decoder
+import time, random
 import numpy as np
-from mnnl import FFSequencePredictor, Layer, RNNSequencePredictor, BiRNNSequencePredictor
+from spacy_jptdp.utils import read_conll, read_conll_predict, write_conll, load_embeddings_file, ConllEntry
+import spacy_jptdp.decoder as decoder
+from spacy_jptdp.mnnl import FFSequencePredictor, Layer, RNNSequencePredictor, BiRNNSequencePredictor
 
 class jPosDepLearner:
     def __init__(self, vocab, pos, rels, w2i, c2i, options):
@@ -29,7 +30,7 @@ class jPosDepLearner:
         self.cdims = options.cembedding_dims
         self.layers = options.lstm_layers
         self.wordsCount = vocab
-        self.vocab = {word: ind + 3 for word, ind in w2i.iteritems()}
+        self.vocab = {word: ind + 3 for word, ind in w2i.items()}
         self.pos = {word: ind for ind, word in enumerate(pos)}
         self.id2pos = {ind: word for ind, word in enumerate(pos)}
         self.c2i = c2i
@@ -43,7 +44,7 @@ class jPosDepLearner:
         self.clookup = self.model.add_lookup_parameters((len(c2i), self.cdims))
         self.plookup = self.model.add_lookup_parameters((len(pos), self.pdims))
 
-        if options.external_embedding is not None:
+        if False: # options.external_embedding is not None:
             ext_embeddings, ext_emb_dim = load_embeddings_file(options.external_embedding, lower=True)
             assert (ext_emb_dim == self.wdims)
             print("Initializing word embeddings by pre-trained vectors")
@@ -116,7 +117,7 @@ class jPosDepLearner:
         return output
 
     def __evaluate(self, sentence):
-        exprs = [[self.__getExpr(sentence, i, j) for j in xrange(len(sentence))] for i in xrange(len(sentence))]
+        exprs = [[self.__getExpr(sentence, i, j) for j in range(len(sentence))] for i in range(len(sentence))]
         scores = np.array([[output.scalar_value() for output in exprsRow] for exprsRow in exprs])
 
         return scores, exprs
@@ -148,7 +149,7 @@ class jPosDepLearner:
     def Predict(self, conll_path):
         with open(conll_path, 'r') as conllFP:
             for iSentence, sentence in enumerate(read_conll_predict(conllFP, self.c2i, self.wordsCount)):
-                conll_sentence = [entry for entry in sentence if isinstance(entry, utils.ConllEntry)]
+                conll_sentence = [entry for entry in sentence if isinstance(entry, ConllEntry)]
 
                 for entry in conll_sentence:
                     wordvec = self.wlookup[int(self.vocab.get(entry.norm, 0))] if self.wdims > 0 else None
@@ -157,7 +158,7 @@ class jPosDepLearner:
                     rev_last_state = self.char_rnn.predict_sequence([self.clookup[c] for c in reversed(entry.idChars)])[
                         -1]
 
-                    entry.vec = concatenate(filter(None, [wordvec, last_state, rev_last_state]))
+                    entry.vec = concatenate([wordvec, last_state, rev_last_state])
 
                     entry.pos_lstms = [entry.vec, entry.vec]
                     entry.headfov = None
@@ -275,14 +276,13 @@ class jPosDepLearner:
 
             for iSentence, sentence in enumerate(shuffledData):
                 if iSentence % 500 == 0 and iSentence != 0:
-                    print "Processing sentence number: %d" % iSentence, ", Loss: %.4f" % (
-                                eloss / etotal), ", Time: %.2f" % (time.time() - start)
+                    print("Processing sentence number: %d" % iSentence, ", Loss: %.4f" % (eloss / etotal), ", Time: %.2f" % (time.time() - start))
                     start = time.time()
                     eerrors = 0
                     eloss = 0.0
                     etotal = 0
 
-                conll_sentence = [entry for entry in sentence if isinstance(entry, utils.ConllEntry)]
+                conll_sentence = [entry for entry in sentence if isinstance(entry, ConllEntry)]
 
                 for entry in conll_sentence:
                     c = float(self.wordsCount.get(entry.norm, 0))
@@ -397,5 +397,5 @@ class jPosDepLearner:
 
                     renew_cg()
 
-        print "Loss: %.4f" % (mloss / iSentence)
+        print("Loss: %.4f" % (mloss / iSentence))
 
