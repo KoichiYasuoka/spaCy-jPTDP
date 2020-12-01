@@ -25,7 +25,7 @@ finished ADJ   ═╝═╝═╗ ROOT
 .        PUNCT <════╝ punct
 ```
 
-`spacy_jptdp.load(treebank)` loads spaCy Language pipeline for jPTDP.
+`spacy_jptdp.load(treebank)` loads spaCy Language pipeline for jPTDP. Available treebanks are [HERE](https://github.com/KoichiYasuoka/spaCy-jPTDP/tree/master/treebanks).
 
 ## Installation
 

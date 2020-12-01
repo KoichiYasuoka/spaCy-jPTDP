@@ -8,7 +8,7 @@ from spacy.language import Language
 
 PACKAGE_DIR=os.path.abspath(os.path.dirname(__file__))
 DOWNLOAD_DIR=os.path.join(PACKAGE_DIR,"models")
-MODEL_URL="https://raw.githubusercontent.com/KoichiYasuoka/spaCy-jPTDP/master/models-gzip/"
+MODEL_URL="https://raw.githubusercontent.com/KoichiYasuoka/spaCy-jPTDP/master/treebanks/"
 SPACY_V3=hasattr(Language,"component")
 tm=time.time()
 
