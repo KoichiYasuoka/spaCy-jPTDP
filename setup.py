@@ -6,7 +6,7 @@ URL="https://github.com/KoichiYasuoka/spaCy-jPTDP"
 
 setuptools.setup(
   name="spacy_jptdp",
-  version="0.3.0",
+  version="0.3.1",
   description="jPTDP wrapper for spaCy",
   long_description=long_description,
   long_description_content_type="text/markdown",
@@ -19,7 +19,7 @@ setuptools.setup(
   install_requires=[
     "spacy>=2.2.2",
     "dyNET>=2.0.3",
-    "deplacy>=1.8.5"
+    "deplacy>=1.8.8"
   ],
   python_requires=">=3.6",
   classifiers=[
