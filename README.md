@@ -30,6 +30,8 @@ finished ADJ   ═╝═╝═╗ ROOT
 ## Installation
 
 ```sh
+pip install 'setuptools<57' 'numpy<2'
+pip install dynet --no-build-isolation
 pip install spacy_jptdp
 ```
 
